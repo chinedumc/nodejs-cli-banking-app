@@ -1,0 +1,22 @@
+{
+  "name": "nodejs-cli-banking-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chinedumc/nodejs-cli-banking-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chinedumc/nodejs-cli-banking-app/issues"
+  },
+  "homepage": "https://github.com/chinedumc/nodejs-cli-banking-app#readme",
+  "dependencies": {
+    "pg": "^8.11.3"
+  }
+}
