@@ -1,5 +1,4 @@
-const { log } = require("console");
-const { resolve } = require("path");
+// The CLI application
 const {
 	createNewAccount,
 	withdraw,
@@ -40,7 +39,8 @@ const start = async () => {
 			const acId = Number(await ip("Enter Account Id"));
 			const acNm = await ip("Enter Account Name");
 			const acBal = 0.0;
-			console.log(typeof acBal);
+			// console.log(typeof acBal);
+			// console.log(typeof acId);
 			createNewAccount({ acId, acNm, acBal });
 		} else if (choice == 2) {
 			console.log("\n Deposit Money");

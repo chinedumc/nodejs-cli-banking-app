@@ -18,10 +18,10 @@ try {
 	console.log(err);
 }
 
-const createNewAccount = async (acId, acNm, acBal) => {
+const createNewAccount = async ({acId, acNm, acBal}) => {
 	try {
 		await client.query(
-			`insert into account ("acct_id", "acct_num", "acct_bal") values ($1,$2,$3)`,
+			`insert into account ("acct_id", "acct_name", "acct_bal") values ($1,$2,$3)`,
 			[acId, acNm, acBal]
 		);
 		return console.log("New Account Created Successfully");
@@ -29,6 +29,9 @@ const createNewAccount = async (acId, acNm, acBal) => {
 		console.log(error);
 		return console.log("Account creation failed!!!");
 	} finally {
+		// console.log(typeof acBal);
+		// console.log(typeof acNm);
+		// console.log(typeof acId);
 		await client.end();
 	}
 };
@@ -119,6 +122,7 @@ const checkBalance = async ({ acId }) => {
 
 // withdraw({acId:2, withrawalAmount:100});
 
+// createNewAccount(4, "tytu", 7500);
 // createNewAccount(2, "abc", 800).then((result) => {
 // 	if (result) {
 // 		console.log("New Account Created Successfully");
