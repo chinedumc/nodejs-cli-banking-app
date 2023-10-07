@@ -12,33 +12,33 @@ const connect = async () => await client.connect();
 
 try {
 	connect();
-	console.log("Connected Successfully");
+	console.log("Connected Successfully!");
 } catch (error) {
 	console.log("Error In Connectivity");
 	console.log(err);
 }
 
-const createNewAccount = async ({acId, acNm, acBal}) => {
+const createNewAccount = async ({ acId, acNm, acBal },onCreate=undefined) => {
 	try {
 		await client.query(
 			`insert into account ("acct_id", "acct_name", "acct_bal") values ($1,$2,$3)`,
 			[acId, acNm, acBal]
 		);
+		if (onCreate) {
+			onCreate(`Account with Id ${acId} created successfully`)
+		}
 		return console.log("New Account Created Successfully");
 	} catch (error) {
 		console.log(error);
 		return console.log("Account creation failed!!!");
 	} finally {
-		// console.log(typeof acBal);
-		// console.log(typeof acNm);
-		// console.log(typeof acId);
 		await client.end();
 	}
 };
 
-const withdraw = async ({ acId, withrawalAmount }) => {
+const withdraw = async ({ acId, withdrawalAmount }, onWithdraw = undefined) => {
 	// try {
-	if (withrawalAmount < 0) {
+	if (withdrawalAmount < 0) {
 		return console.log("Improper withdrawal value");
 	}
 	const { rows } = await client.query(
@@ -46,10 +46,10 @@ const withdraw = async ({ acId, withrawalAmount }) => {
 		[acId]
 	);
 	let acBal = parseFloat(rows[0].acct_bal);
-	const newBal = acBal - withrawalAmount;
-	if (acBal < withrawalAmount) {
+	const newBal = acBal - withdrawalAmount;
+	if (acBal < withdrawalAmount) {
 		console.log("Insufficient funds!");
-	} else if (acBal > withrawalAmount) {
+	} else if (acBal > withdrawalAmount) {
 		// console.log(acBal, withrawalAmount, "here");
 
 		await client.query(`update account set acct_bal = $1 where acct_id = $2`, [
@@ -59,8 +59,11 @@ const withdraw = async ({ acId, withrawalAmount }) => {
 		console.log(`Your current balance is ${acBal}`);
 
 		console.log(
-			` ${withrawalAmount} withdrawn successfully. Your new balance is ${newBal}`
+			` ${withdrawalAmount} withdrawn successfully. Your new balance is ${newBal}`
 		);
+		if (onWithdraw) {
+			onWithdraw(` ${withdrawalAmount} withdrawn successfully.`);
+		}
 	} else {
 		console.log("Problem withdrawing. Contact Support");
 	}
@@ -70,7 +73,7 @@ const withdraw = async ({ acId, withrawalAmount }) => {
 	// }
 };
 
-const deposit = async ({ acId, depositAmount }) => {
+const deposit = async ({ acId, depositAmount }, onDeposit = undefined) => {
 	// try {
 	if (depositAmount > 0) {
 		const { rows } = await client.query(
@@ -89,6 +92,9 @@ const deposit = async ({ acId, depositAmount }) => {
 		console.log(
 			` ${depositAmount} deposited successfully. Your new balance is ${newBal}`
 		);
+		if (onDeposit) {
+			onDeposit(` ${depositAmount} deposited successfully.`);
+		}
 	}
 	// } catch (error) {
 	else {
@@ -99,12 +105,23 @@ const deposit = async ({ acId, depositAmount }) => {
 	// }
 };
 
-const transferFund = async ({ srcAcct, destAcct, transferAmount }) => {
-	await withdraw({ acId: srcAcct, withrawalAmount: transferAmount });
-	await deposit({ acId: destAcct, depositAmount: transferAmount });
+const transferFund = async (
+	{ srcAcct, destAcct, transferAmount },
+	onTransfer = undefined
+) => {
+	await withdraw(
+		{ acId: srcAcct, withdrawalAmount: transferAmount },
+		(msgWd) => {
+			deposit({ acId: destAcct, depositAmount: transferAmount }, (msgDp) => {
+				if (onTransfer) {
+					onTransfer(`${transferAmount} transferred successfully!`);
+				}
+			});
+		}
+	);
 };
 
-const checkBalance = async ({ acId }) => {
+const checkBalance = async (acId, onBal = undefined) => {
 	const { rows } = await client.query(
 		`select acct_bal from account where acct_id = $1`,
 		[acId]
@@ -112,6 +129,9 @@ const checkBalance = async ({ acId }) => {
 	let acBal = parseFloat(rows[0].acct_bal);
 
 	console.log(`Your current balance is ${acBal}`);
+	if (onBal) {
+		onBal(acBal);
+	}
 };
 
 // checkBalance({ acId: 2 });
