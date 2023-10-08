@@ -1,8 +1,9 @@
 
+
 function App() {
   return (
-    <div>
-     Banking app
+    <div className="App">
+     
     </div>
   );
 }
